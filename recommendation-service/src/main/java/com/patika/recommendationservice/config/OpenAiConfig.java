@@ -1,4 +1,4 @@
-package com.patika.recommendedservice.config;
+package com.patika.recommendationservice.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
