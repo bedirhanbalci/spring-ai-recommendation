@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.patika</groupId>
-    <artifactId>recommended-service</artifactId>
+    <artifactId>recommendation-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>recommended-service</name>
     <description>recommended-service</description>
@@ -56,6 +56,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
