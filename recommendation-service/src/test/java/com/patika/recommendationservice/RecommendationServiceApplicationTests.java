@@ -1,10 +1,10 @@
-package com.patika.recommendedservice;
+package com.patika.recommendationservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RecommendedServiceApplicationTests {
+class RecommendationServiceApplicationTests {
 
     @Test
     void contextLoads() {
