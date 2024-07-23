@@ -1,9 +1,13 @@
 package com.patika.recommendationservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.patika.recommendationservice.converter.RecommendationConverter;
 import com.patika.recommendationservice.dto.request.RecommendationRequest;
+import com.patika.recommendationservice.dto.response.OpenAiErrorResponse;
 import com.patika.recommendationservice.dto.response.RecommendationResponse;
-import com.patika.recommendationservice.util.JsonUtil;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +19,7 @@ import java.net.http.HttpResponse;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationService {
 
     private final HttpClient httpClient;
@@ -24,16 +29,16 @@ public class RecommendationService {
 
     public RecommendationResponse getRecommendation(RecommendationRequest recommendationRequest) {
         var body = """
-                {
-                    "model": "gpt4",
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": "%s"
-                        }
-                    ]
-                }
-                """.formatted(recommendationRequest.getMessage());
+                    {
+                        "model": "gpt-3.5-turbo",
+                        "messages": [
+                                        {
+                                            "role": "system", "content": "You are a helpful assistant.",
+                                            "role": "user", "content": "What is a LLM?"
+                                        }
+                                    ]
+                    }
+                """;
 
         HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.openai.com/v1/chat/completions"))
@@ -44,18 +49,23 @@ public class RecommendationService {
 
         try {
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            return new RecommendationResponse(response.body());
+            log.info(response.body());
+            RecommendationResponse recommendationResponse = new ObjectMapper().readValue(response.body(), RecommendationResponse.class);
+            if (response.statusCode() != 200) {
+                return RecommendationConverter.toFailedResponse(recommendationResponse);
+            } else {
+                return RecommendationConverter.toSuccessResponse(recommendationResponse);
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return new RecommendationResponse("Error occured.");
+            /**
+             * Exception Handler olmalı, bu şekilde değil
+             */
+            RecommendationResponse recommendationResponse = new RecommendationResponse();
+            recommendationResponse.setError(new OpenAiErrorResponse(e.getMessage(), "exception", null, "exception"));
+            return RecommendationConverter.toFailedResponse(recommendationResponse);
         }
 
-    }
-
-    private RecommendationResponse parseResponse(String responseBody) {
-        // Extract the actual response content from the JSON response
-        String content = JsonUtil.extractContent(responseBody);
-        return new RecommendationResponse(content);
     }
 
 }
