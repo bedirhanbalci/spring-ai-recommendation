@@ -1,5 +1,6 @@
 package com.patika.recommendationservice.converter;
 
+import com.patika.recommendationservice.dto.response.OpenAiSuccessResponse;
 import com.patika.recommendationservice.dto.response.RecommendationResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,10 +15,10 @@ public class RecommendationConverter {
                 .build();
     }
 
-    public static RecommendationResponse toSuccessResponse(RecommendationResponse recommendationResponse) {
+    public static RecommendationResponse toSuccessResponse(OpenAiSuccessResponse openAiSuccessResponse) {
 
         return RecommendationResponse.builder()
-                .openAiSuccessResponse(recommendationResponse.getOpenAiSuccessResponse())
+                .success(openAiSuccessResponse)
                 .build();
     }
 }
