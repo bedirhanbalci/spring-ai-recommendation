@@ -1,1 +1,0 @@
-export const defaultBlogFoto = "https://firebasestorage.googleapis.com/v0/b/image-storage-8513d.appspot.com/o/java.jpg?alt=media&token=1402a700-3a83-4f06-a858-be961897d3ef"
