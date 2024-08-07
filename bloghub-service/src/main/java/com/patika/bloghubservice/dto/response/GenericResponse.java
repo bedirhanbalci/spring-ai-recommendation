@@ -32,6 +32,15 @@ public class GenericResponse<T> {
                 .build();
     }
 
+    public static <T> GenericResponse<T> success(T data, HttpStatus httpStatus, String message) {
+        return GenericResponse.<T>builder()
+                .httpStatus(httpStatus)
+                .status(GenericResponseConstants.SUCCESS)
+                .message(message)
+                .data(data)
+                .build();
+    }
+
     public static <T> GenericResponse<T> failed(String message) {
         return GenericResponse.<T>builder()
                 .httpStatus(HttpStatus.BAD_REQUEST)

@@ -1,0 +1,12 @@
+a{
+    text-decoration: none;
+}
+.right-aligned-buttons {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.logout{
+    margin: 10px;
+}

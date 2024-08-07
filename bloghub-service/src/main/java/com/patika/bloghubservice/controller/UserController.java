@@ -2,6 +2,7 @@ package com.patika.bloghubservice.controller;
 
 import com.patika.bloghubservice.dto.request.ChangePasswordRequest;
 import com.patika.bloghubservice.dto.request.ChangeStatusBulkRequest;
+import com.patika.bloghubservice.dto.request.UserLoginRequest;
 import com.patika.bloghubservice.dto.request.UserSaveRequest;
 import com.patika.bloghubservice.dto.response.GenericResponse;
 import com.patika.bloghubservice.dto.response.UserResponse;
@@ -19,18 +20,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements Controller{
 
     private final UserService userService;
 
-    @PostMapping()
+    @PostMapping
     public GenericResponse<UserResponse> createUser(@RequestBody UserSaveRequest request) {
-        return GenericResponse.success(userService.saveUser(request), HttpStatus.CREATED);
+        return GenericResponse.success(userService.saveUser(request), HttpStatus.CREATED, "User created successfully! You can login now.");
     }
 
     @GetMapping("/{email}")
     public GenericResponse<UserResponse> getUserByEmail(@PathVariable String email) {
         return GenericResponse.success(userService.getUserByEmail(email), HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public GenericResponse<UserResponse> login(@RequestBody UserLoginRequest loginRequest) {
+        return GenericResponse.success(userService.login(loginRequest), HttpStatus.OK, "Login successful");
     }
 
     @GetMapping

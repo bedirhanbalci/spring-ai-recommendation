@@ -4,6 +4,7 @@ package com.patika.bloghubservice.service;
 import com.patika.bloghubservice.converter.UserConverter;
 import com.patika.bloghubservice.dto.request.ChangePasswordRequest;
 import com.patika.bloghubservice.dto.request.ChangeStatusBulkRequest;
+import com.patika.bloghubservice.dto.request.UserLoginRequest;
 import com.patika.bloghubservice.dto.request.UserSaveRequest;
 import com.patika.bloghubservice.dto.response.UserResponse;
 import com.patika.bloghubservice.exception.BlogHubException;
@@ -45,6 +46,16 @@ public class UserService {
 
             return UserConverter.toResponse(savedUser);
         }
+    }
+    public UserResponse login(UserLoginRequest loginRequest) {
+        User user = getByEmail(loginRequest.email());
+
+        if (HashPassword.hash(loginRequest.password()).equals(user.getPassword())) {
+            return UserConverter.toResponse(user);
+        }else {
+            throw new BlogHubException(ExceptionMessages.PASSWORD_INCORRECT);
+        }
+
     }
     protected User getByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -104,4 +115,6 @@ public class UserService {
 
         userRepository.updateUser(email, foundUser);
     }
+
+
 }

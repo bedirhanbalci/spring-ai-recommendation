@@ -1,12 +1,13 @@
 package com.patika.bloghubservice.service;
 
 import com.patika.bloghubservice.client.RecommendationService;
+import com.patika.bloghubservice.client.dto.RecommendationRequestList;
+import com.patika.bloghubservice.client.dto.RecommendationResponseList;
 import com.patika.bloghubservice.converter.BlogConverter;
 import com.patika.bloghubservice.dto.request.BlogSaveRequest;
-import com.patika.bloghubservice.client.dto.RecommendationRequestList;
+import com.patika.bloghubservice.dto.request.LikeBlogRequest;
 import com.patika.bloghubservice.dto.response.BlogResponse;
 import com.patika.bloghubservice.dto.response.BlogStatistic;
-import com.patika.bloghubservice.client.dto.RecommendationResponseList;
 import com.patika.bloghubservice.dto.response.UserBlogStatistic;
 import com.patika.bloghubservice.exception.BlogHubException;
 import com.patika.bloghubservice.exception.ExceptionMessages;
@@ -16,9 +17,12 @@ import com.patika.bloghubservice.model.User;
 import com.patika.bloghubservice.model.enums.BlogStatus;
 import com.patika.bloghubservice.model.enums.StatusType;
 import com.patika.bloghubservice.repository.BlogRepository;
+import com.patika.bloghubservice.util.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -30,9 +34,9 @@ public class BlogService {
     private final RecommendationService recommendationService;
 
 
-    public BlogResponse createBlog(String email, BlogSaveRequest request) {
+    public BlogResponse createBlog(BlogSaveRequest request) {
 
-        User foundUser = userService.getByEmail(email);
+        User foundUser = userService.getByEmail(request.getEmail());
         // 8. soru f şıkkı :• Sadece onaylanmış bir kullanıcı blog yayınlayabilir.
         if (!foundUser.getStatusType().equals(StatusType.APPROVED))
             throw new BlogHubException(ExceptionMessages.USER_STATUS_EXCEPTION);
@@ -55,7 +59,6 @@ public class BlogService {
 
         return BlogConverter.toResponse(foundBlog);
     }
-
 
 
     public void addComment(String title, String email, String comment) {
@@ -86,10 +89,14 @@ public class BlogService {
         return blogRepository.findAll();
     }
 
-    public List<BlogResponse> getAllBLogs() {
-        return  getAll().stream()
+    public List<BlogResponse> getAllBLogs(int size, int page) {
+        List<BlogResponse> list = new ArrayList<>(blogRepository.findAll(new Pageable(size, page)).stream()
                 .map(BlogConverter::toResponse)
-                .toList();
+                .toList());
+
+        list.sort(Comparator.comparing(BlogResponse::getTitle));
+
+        return list;
     }
 
     public Long getLikeCountByTitle(String title) {
@@ -103,9 +110,9 @@ public class BlogService {
 
 
     //7. soru b şıkkı : bir kullanıcı sadece maksimum 50 kere beğenebilir
-    public void likeBlog(String title, String email) {
-        Blog blog = getBlogByTitleForOtherService(title);
-        User user = userService.getByEmail(email);
+    public void likeBlog(LikeBlogRequest likeBlogRequest) {
+        Blog blog = getBlogByTitleForOtherService(likeBlogRequest.title());
+        User user = userService.getByEmail(likeBlogRequest.email());
 
         Integer likeCount = blog.getUserLikeCounts().get(user);
         // user daha önce like atmış ve  sayısı 50 den büyükse hata fırtlatır
@@ -116,12 +123,12 @@ public class BlogService {
         // daha önce like atmamış(map te mevcut değil) ise 1 olarak kaydedilir. eğer daha önce like atmışsa eski değere bir eklenir.
         blog.getUserLikeCounts().merge(user, 1, Integer::sum);
 
-        blogRepository.likeBlog(title, blog);
+        blogRepository.likeBlog(likeBlogRequest.title(), blog);
     }
 
     // 7. soru c şıkkı : • Kullanıcı kendi PUBLISHED ve DRAFT olan blog’larını getiren endpoint
     public List<BlogResponse> getAllDraftOrPublishedBlogsByEmail(String email) {
-        List<Blog> userBlogs =  blogRepository.findByUserEmail(email);
+        List<Blog> userBlogs = blogRepository.findByUserEmail(email);
 
         return userBlogs.stream()
                 .filter(blog -> blog.getBlogStatus().equals(BlogStatus.PUBLISHED) || blog.getBlogStatus().equals(BlogStatus.DRAFT))
@@ -132,7 +139,7 @@ public class BlogService {
     // 7. soru d şıkkı : • Kullanıcı kendi blog’larından DRAFT statüsünde olanları hard delete ile silebilir.
     public String hardDeleteBlogIsDraft(String title, String email) {
         // userın blogları çekildi
-        List<Blog> userBlogs =  blogRepository.findByUserEmail(email);
+        List<Blog> userBlogs = blogRepository.findByUserEmail(email);
 
         //userın blogları arasından title göre ilgili blog bulundu
         Blog foundBlog = userBlogs.stream()
@@ -140,7 +147,7 @@ public class BlogService {
                 .findFirst().orElseThrow(() -> new BlogHubException(ExceptionMessages.BLOG_NOT_FOUND_EXCEPTION));
 
         // bulunan blog PUBLISHED status te ise silemeyiz
-        if (foundBlog.getBlogStatus().equals(BlogStatus.PUBLISHED)){
+        if (foundBlog.getBlogStatus().equals(BlogStatus.PUBLISHED)) {
             throw new BlogHubException(ExceptionMessages.CHANGE_BLOG_STATUS_EXCEPTION);
         }
 
@@ -149,8 +156,6 @@ public class BlogService {
 
         return foundBlog.getTitle();
     }
-
-
 
 
     // ODEV : blog istatistikeri
@@ -200,11 +205,20 @@ public class BlogService {
     }
 
 
+    public List<BlogResponse> getBlogRecommendations(String emmail) {
 
-    public List<BlogResponse> getBlogRecommendations(List<String> titles) {
+        User user = userService.getByEmail(emmail);
+
+        List<String> history = getAll().stream().filter(blog ->
+                        blog.getUserLikeCounts().containsKey(user))
+                .map(Blog::getTitle)
+                .toList();
+
+        if (history.isEmpty()) {
+            throw new BlogHubException(ExceptionMessages.RECOMMENDATION_EXCEPTION);
+        }
+
         List<String> repository = getAll().stream().map(Blog::getTitle).toList();
-
-        List<String> history = titles.stream().map(this::getBlogByTitleForOtherService).map(Blog::getTitle).toList();
 
         RecommendationResponseList data = recommendationService.recommendations(new RecommendationRequestList(repository, history)).getData();
 

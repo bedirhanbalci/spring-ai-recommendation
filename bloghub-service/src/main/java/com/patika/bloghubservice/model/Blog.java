@@ -24,6 +24,7 @@ public class Blog {
     private User user;
     private BlogStatus blogStatus;
     private HashMap<User, Integer> userLikeCounts;
+    private String fotoUrl;
     private Long readingCount;
     private List<BlogComment> blogCommentList;
 

@@ -14,6 +14,7 @@ public class BlogConverter {
                 .text(blog.getText())
                 .blogStatus(blog.getBlogStatus())
                 .likeCount(blog.getUserLikeCounts().values().stream().mapToLong(Integer::longValue).sum())
+                .fotoUrl(blog.getFotoUrl())
                 .createdDateTime(blog.getCreatedDate())
                 .blogCommentList(BlogCommentConverter.toResponse(blog.getBlogCommentList()))
                 .build();
