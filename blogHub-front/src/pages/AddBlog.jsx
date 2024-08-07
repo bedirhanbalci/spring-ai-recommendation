@@ -4,10 +4,9 @@ import {Form, Formik} from "formik";
 import CustomTextInput from '../utilities/customFormControls/CustomTextInput';
 import * as Yup from "yup";
 import {useDispatch, useSelector} from 'react-redux';
-import LoadingButton from '../layouts/LoadingButton';
 import {toast, ToastContainer} from 'react-toastify';
 import '../style/css/add-blog.css';
-import {createBlog} from "../redux/slice/blogSlice"; // CSS dosyasını içe aktarın
+import {createBlog} from "../redux/slice/blogSlice";
 
 export default function AddBlog() {
     const initialValues = {
@@ -32,11 +31,6 @@ export default function AddBlog() {
         await dispatch(createBlog(values));
     }
 
-    const isAdding = useSelector((state) => state.book.isAdding);
-
-    const addBookResponse = useSelector((state) => state.book.addBookResponse);
-
-    const addBookError = useSelector((state) => state.book.addBookError);
 
     const createBlogMessage = useSelector((state) => state.blog.createBlogMessage);
 
@@ -48,32 +42,19 @@ export default function AddBlog() {
             <div className="centered-form-container">
                 <div className="centered-form">
                     <ToastContainer/>
-                    {
-                        addBookResponse !== null ?
+                    {createBlogMessage !== null ?
+                        (
+                            toast.success(`${createBlogMessage}`, {
+                                position: toast.POSITION.TOP_LEFT,
+                                toastId: ""
+                            })
+                        ) : createBlogError && createBlogError.message !== null ?
                             (
-                                toast.success(`${addBookResponse.message}`, {
+                                toast.error(`${createBlogError.message}`, {
                                     position: toast.POSITION.TOP_LEFT,
                                     toastId: ""
                                 })
-                            ) : addBookError === "ERR_BAD_REQUEST" ?
-                                (
-                                    toast.error(`Kitap Eklenemedi`, {
-                                        position: toast.POSITION.TOP_LEFT,
-                                        toastId: ""
-                                    })
-                                ) : createBlogMessage !== null ?
-                                    (
-                                        toast.success(`${createBlogMessage}`, {
-                                            position: toast.POSITION.TOP_LEFT,
-                                            toastId: ""
-                                        })
-                                    ) : createBlogError && createBlogError.message !== null ?
-                                        (
-                                            toast.error(`${createBlogError.message}`, {
-                                                position: toast.POSITION.TOP_LEFT,
-                                                toastId: ""
-                                            })
-                                        ) : null
+                            ) : null
                     }
                     <Formik
                         initialValues={initialValues}
@@ -108,15 +89,11 @@ export default function AddBlog() {
                             </div>
 
 
-                            {
-                                isAdding ?
-                                    (
-                                        <LoadingButton/>
-                                    ) : (
-                                        <button type='submit' className="btn btn-primary" style={{width: '100%'}}>Add
-                                            Blog</button>
-                                    )
-                            }
+                            <button type='submit' className="btn btn-primary" style={{width: '100%'}}>Add
+                                Blog
+                            </button>
+
+
                         </Form>
                     </Formik>
                 </div>
