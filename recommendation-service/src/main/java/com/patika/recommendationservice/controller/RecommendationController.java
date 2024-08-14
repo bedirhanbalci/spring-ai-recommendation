@@ -1,8 +1,8 @@
 package com.patika.recommendationservice.controller;
 
-import com.patika.recommendationservice.dto.request.RecommendationRequest;
+import com.patika.recommendationservice.dto.request.RecommendationRequestList;
 import com.patika.recommendationservice.dto.response.GenericResponse;
-import com.patika.recommendationservice.dto.response.RecommendationResponse;
+import com.patika.recommendationservice.dto.response.RecommendationResponseList;
 import com.patika.recommendationservice.service.RecommendationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +18,11 @@ public class RecommendationController {
 
     private final RecommendationService recommendationService;
 
-    @PostMapping()
-    public GenericResponse<RecommendationResponse> recommendations(@RequestBody RecommendationRequest recommendationRequest) {
+    @PostMapping("/recommendations")
+    public GenericResponse<RecommendationResponseList> recommendations(@RequestBody RecommendationRequestList recommendationRequest) {
         return GenericResponse.success(recommendationService.getRecommendation(recommendationRequest), HttpStatus.OK);
     }
+
+
 
 }
