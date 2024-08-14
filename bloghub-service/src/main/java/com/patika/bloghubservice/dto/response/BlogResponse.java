@@ -18,6 +18,7 @@ public class BlogResponse {
     private String text;
     private LocalDateTime createdDateTime;
     private BlogStatus blogStatus;
+    private String fotoUrl;
     private Long likeCount;
     private List<BlogCommentResponse> blogCommentList = new ArrayList<>();
 

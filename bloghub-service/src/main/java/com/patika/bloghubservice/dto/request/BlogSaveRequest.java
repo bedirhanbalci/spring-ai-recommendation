@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @Setter
 public class BlogSaveRequest {
+    private String email;
     private String title;
     private String text;
 }

@@ -27,7 +27,7 @@ public class User {
 
     public User(String email, String password) {
         this.userType = UserType.STANDARD;
-        this.statusType = StatusType.WAITING_APPROVAL;
+        this.statusType = StatusType.APPROVED;
         this.email = email;
         this.password = password;
     }

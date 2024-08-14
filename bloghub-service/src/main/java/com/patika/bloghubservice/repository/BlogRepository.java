@@ -3,6 +3,7 @@ package com.patika.bloghubservice.repository;
 
 import com.patika.bloghubservice.model.Blog;
 import com.patika.bloghubservice.model.enums.BlogStatus;
+import com.patika.bloghubservice.util.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -25,6 +26,10 @@ public class BlogRepository {
                 .filter(blog -> blog.getTitle().equals(title))
                 .filter(blog -> !blog.getBlogStatus().equals(BlogStatus.DELETED))
                 .findFirst();
+    }
+
+    public List<Blog> findAll(Pageable pageable) {
+        return blogMap.values().stream().skip(pageable.getOffset()).limit(pageable.size()).toList();
     }
 
     public List<Blog> findAll() {

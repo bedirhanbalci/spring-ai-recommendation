@@ -15,8 +15,8 @@ public class ExceptionMessages {
     public static final String CHANGE_BLOG_STATUS_EXCEPTION = "statüsü PUBLISHED olan bir blog silinemez.";
     public static final String USER_STATUS_EXCEPTION = "Blog paylaşabilmek için APPROVED statüsünde bir kullanıcı olmanız gerekir";
     public static final String BLOG_NOT_FOUND_EXCEPTION = "Blog bulunamadı.";
-    public static final String FIREBASE_JSON_NOT_FOUND = "Firebase josn dosyası bulunamadı.";
     public static final String USER_STATUS_NOT_APPROVED = "APPROVED statüde olmayan kullanıcılar PREMIUM pakete geçemez.";
+    public static final String RECOMMENDATION_EXCEPTION = "You need to like to get a blog recommendation.";
 
 
 }
