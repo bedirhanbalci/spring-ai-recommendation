@@ -36,10 +36,10 @@ public class RecommendationService {
         meeting.append("""
                 I want you to give me the data in json format. in a list called blogTitles.
                 {
-                    blogTitles : [
-                        “blog title”,
-                        “blog title”,
-                        “blog title”,
+                    "blogTitles" : [
+                        "blog title",
+                        "blog title",
+                        "blog title"
                        ]
                 }
                 """);
